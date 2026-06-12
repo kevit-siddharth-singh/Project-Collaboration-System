@@ -1,0 +1,885 @@
+{
+	"info": {
+		"_postman_id": "b2f397c3-8406-4101-93bd-025f2468f602",
+		"name": "Project Collaboration System",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "53878845",
+		"_collection_link": "https://kevit-siddharth-team.postman.co/workspace/Nest-Learning-~0c60bf4e-25d2-42b7-b08c-4b6984097b11/collection/53878845-b2f397c3-8406-4101-93bd-025f2468f602?action=share&source=collection_link&creator=53878845"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Admin\",\n  \"email\": \"test@test.com\",\n  \"password\": \"Admin123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/auth/register",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Parse response",
+									"const res = pm.response.json();",
+									"",
+									"// Adjust this path based on your API response",
+									"const accessToken =  res.data?.tokens.accessToken;",
+									"const refreshToken =  res.data?.tokens.refreshToken;",
+									"",
+									"",
+									"// Save to environment variable",
+									"pm.environment.set(\"access_token\", accessToken);",
+									"pm.environment.set(\"refresh_token\", refreshToken)",
+									"",
+									"// Optional: log for debugging",
+									"console.log(\"Saved Token\");"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "// {\n//   \"email\": \"test@test.com\",\n//   \"password\": \"Admin123\"\n// }\n\n{\n  \"email\": \"john@example.com\",\n  \"password\": \"strongPassword123\"\n}\n\n// {\n//   \"email\": \"test@test1.com\",\n//   \"password\": \"Admin123\"\n// }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/auth/login",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{refresh_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BaseURL}}/auth/refresh",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BaseURL}}/auth/logout",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Admin",
+					"item": [
+						{
+							"name": "List Users",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{BaseURL}}/users",
+									"host": [
+										"{{BaseURL}}"
+									],
+									"path": [
+										"users"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Fetch User Details",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{BaseURL}}/users/{{id}}",
+									"host": [
+										"{{BaseURL}}"
+									],
+									"path": [
+										"users",
+										"{{id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete User",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{BaseURL}}/users/{{id}}",
+									"host": [
+										"{{BaseURL}}"
+									],
+									"path": [
+										"users",
+										"{{id}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Fetch LoggedIn User Details",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BaseURL}}/users/{{id}}",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"users",
+								"{{id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Projects",
+			"item": [
+				{
+					"name": "List Projects",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "*/*"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2YTJiOWI3OWMyOTM0NjhiMTc0NDQ2NWUiLCJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3ODEyNDY3MzYsImV4cCI6MTc4MTI0NzYzNn0.59yyzE0JP_bYGPyEYlwVr4PVDvQHSe5m0C9kh90qmnM"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BaseURL}}/projects",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"projects"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Project",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "*/*"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2YTJiOWI3OWMyOTM0NjhiMTc0NDQ2NWUiLCJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3ODEyNDY3MzYsImV4cCI6MTc4MTI0NzYzNn0.59yyzE0JP_bYGPyEYlwVr4PVDvQHSe5m0C9kh90qmnM"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"THe Test Project\",\n  \"description\": \"A Test tasks\",\n  \"members\": [\"6a2b9b1ec293468b1744465d\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/projects",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"projects"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fetch Project Details",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "*/*"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2YTJiOWI3OWMyOTM0NjhiMTc0NDQ2NWUiLCJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3ODEyNDY3MzYsImV4cCI6MTc4MTI0NzYzNn0.59yyzE0JP_bYGPyEYlwVr4PVDvQHSe5m0C9kh90qmnM"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BaseURL}}/projects/{{id}}",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"projects",
+								"{{id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Project Details",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n//   \"title\": \"Test Title\",\n  \"description\": \"Updated description\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/projects/{{id}}",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"projects",
+								"{{id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Project",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BaseURL}}/projects/{{id}}",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"projects",
+								"{{id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Issues",
+			"item": [
+				{
+					"name": "Create Issue",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Test 2\",\n  \"description\": \"Users cannot login with special characters in password\",\n  \"status\": \"completed\",\n  \"priority\": \"high\",\n  \"assignedTo\": \"6a2b9b79c293468b1744465e\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/projects/{{id}}/issues",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"projects",
+								"{{id}}",
+								"issues"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Issues",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "*/*"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2YTJiOWI3OWMyOTM0NjhiMTc0NDQ2NWUiLCJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3ODEyNDY3MzYsImV4cCI6MTc4MTI0NzYzNn0.59yyzE0JP_bYGPyEYlwVr4PVDvQHSe5m0C9kh90qmnM"
+							}
+						],
+						"url": {
+							"raw": "{{BaseURL}}/projects/{{projectId}}/issues?status=todo&sortBy=createdAt&sortOrder=desc&page=1&limit=10",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"projects",
+								"{{projectId}}",
+								"issues"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "todo"
+								},
+								{
+									"key": "priority",
+									"value": "low",
+									"disabled": true
+								},
+								{
+									"key": "assignedTo",
+									"value": "6a2b9b79c293468b1744465e",
+									"disabled": true
+								},
+								{
+									"key": "sortBy",
+									"value": "createdAt"
+								},
+								{
+									"key": "sortOrder",
+									"value": "desc"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fetch Issue Details",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "*/*"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2YTJiOWI3OWMyOTM0NjhiMTc0NDQ2NWUiLCJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3ODEyNDY3MzYsImV4cCI6MTc4MTI0NzYzNn0.59yyzE0JP_bYGPyEYlwVr4PVDvQHSe5m0C9kh90qmnM"
+							}
+						],
+						"url": {
+							"raw": "{{BaseURL}}/projects/{{projectId}}/issues",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"projects",
+								"{{projectId}}",
+								"issues"
+							],
+							"query": [
+								{
+									"key": "priority",
+									"value": "low",
+									"disabled": true
+								},
+								{
+									"key": "assignedTo",
+									"value": "6a2b9b79c293468b1744465e",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Issue Details",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "accept",
+								"value": "*/*"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2YTJiOWI3OWMyOTM0NjhiMTc0NDQ2NWUiLCJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3ODEyNDY3MzYsImV4cCI6MTc4MTI0NzYzNn0.59yyzE0JP_bYGPyEYlwVr4PVDvQHSe5m0C9kh90qmnM"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n//   \"title\": \"string\",\n//   \"description\": \"string\",\n  \"status\": \"todo\"\n//   \"priority\": \"low\"\n//   \"assignedTo\": \"string\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/projects/{{projectId}}/issues/{{id}}",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"projects",
+								"{{projectId}}",
+								"issues",
+								"{{id}}"
+							],
+							"query": [
+								{
+									"key": "priority",
+									"value": "low",
+									"disabled": true
+								},
+								{
+									"key": "assignedTo",
+									"value": "6a2b9b79c293468b1744465e",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Issue",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "accept",
+								"value": "*/*"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2YTJiOWI3OWMyOTM0NjhiMTc0NDQ2NWUiLCJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3ODEyNDY3MzYsImV4cCI6MTc4MTI0NzYzNn0.59yyzE0JP_bYGPyEYlwVr4PVDvQHSe5m0C9kh90qmnM"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BaseURL}}/projects/{{projectId}}/issues/{{id}}",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"projects",
+								"{{projectId}}",
+								"issues",
+								"{{id}}"
+							],
+							"query": [
+								{
+									"key": "priority",
+									"value": "low",
+									"disabled": true
+								},
+								{
+									"key": "assignedTo",
+									"value": "6a2b9b79c293468b1744465e",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Reports (Admin)",
+			"item": [
+				{
+					"name": "Issues By Status",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "Project Issue Count",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "Top Assigned Users",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BaseURL}}/reports/top-assigned-users",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"reports",
+								"top-assigned-users"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Miscellaneous",
+			"item": [
+				{
+					"name": "Swagger Doc Enpoint",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BaseURL}}/docs",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"docs"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
