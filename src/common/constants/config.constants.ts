@@ -8,4 +8,5 @@ export const CONFIG_KEYS = {
   JWT_REFRESH_EXPIRES_IN: 'jwt.refreshExpiresIn',
 
   PORT: 'app.port',
-};
+  NODE_ENV: 'app.nodeEnv',
+} as const;
