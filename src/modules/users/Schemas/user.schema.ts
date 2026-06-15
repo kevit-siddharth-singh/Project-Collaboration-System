@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 
-import { UserRole } from '../../common/enums/user-role.enums';
+import { UserRole } from '../../../common/enums/user-role.enums';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -10,12 +10,14 @@ export type UserDocument = HydratedDocument<User>;
 })
 export class User {
   @Prop({
+    type: String,
     required: true,
     trim: true,
   })
   name!: string;
 
   @Prop({
+    type: String,
     required: true,
     unique: true,
     lowercase: true,
@@ -23,17 +25,23 @@ export class User {
   email!: string;
 
   @Prop({
+    type: String,
     required: true,
+    select: false,
   })
   password!: string;
 
   @Prop({
+    type: String,
     enum: UserRole,
     default: UserRole.USER,
   })
   role!: UserRole;
 
-  @Prop()
+  @Prop({
+    type: String,
+    select: false,
+  })
   hashedRefreshToken?: string;
 }
 

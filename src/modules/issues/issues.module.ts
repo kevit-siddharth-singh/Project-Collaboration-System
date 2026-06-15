@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Issue, IssueSchema } from '../../database/schemas/issue.schema';
+import { Issue, IssueSchema } from './Schemas/issue.schema';
 import { IssueRepository } from './repositories/issue.repository';
-import { IssuesService } from './services/issues/issues.service';
-import { IssuesController } from './controllers/issues/issues.controller';
+import { IssuesService } from './issues.service';
+
 import { ProjectsModule } from '../projects/projects.module';
+import { IssuesController } from './issues.controller';
 
 @Module({
   imports: [

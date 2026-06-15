@@ -8,13 +8,13 @@ import {
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-import { AuthService } from '../../services/auth/auth.service';
-import { RegisterDto } from '../../dto/register.dto';
-import { LoginDto } from '../../dto/login.dto';
-import { CurrentUser } from '../../../../common/decorators/current-user.decorator';
-import type { JwtRefreshPayload } from '../../strategies/jwt-refresh.strategy';
-import { JwtAuthGuard } from '../../../../common/guards/jwt-auth.guard';
-import type { JwtPayload } from '../../interfaces/jwt-payload.interface';
+import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import type { JwtRefreshPayload } from './strategies/jwt-refresh.strategy';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import type { JwtPayload } from './interfaces/jwt-payload.interface';
+import { AuthService } from './auth.service';
 
 @ApiTags('Auth')
 @Controller('auth')

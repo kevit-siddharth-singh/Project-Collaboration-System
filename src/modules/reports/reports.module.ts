@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Issue, IssueSchema } from '../../database/schemas/issue.schema';
-import { ReportsService } from './services/reports/reports.service';
-import { ReportsController } from './controllers/reports/reports.controller';
+import { Issue, IssueSchema } from '../issues/Schemas/issue.schema';
+import { ReportsService } from './reports.service';
+import { ReportsController } from './reports.controller';
 
 @Module({
   imports: [

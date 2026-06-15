@@ -1,7 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Issue, IssueDocument } from '../../../../database/schemas/issue.schema';
+import { Issue, IssueDocument } from '../issues/Schemas/issue.schema';
+import {
+  IssuesByStatus,
+  ProjectIssueCount,
+  TopAssignedUser,
+} from './interfaces/report.interface';
 
 @Injectable()
 export class ReportsService {
@@ -9,7 +14,7 @@ export class ReportsService {
     @InjectModel(Issue.name) private readonly issueModel: Model<IssueDocument>,
   ) {}
 
-  async getIssuesByStatus(): Promise<{ status: string; count: number }[]> {
+  async getIssuesByStatus(): Promise<IssuesByStatus[]> {
     return this.issueModel.aggregate([
       {
         $group: {
@@ -28,9 +33,7 @@ export class ReportsService {
     ]);
   }
 
-  async getProjectIssueCount(): Promise<
-    { projectId: string; projectTitle: string; count: number }[]
-  > {
+  async getProjectIssueCount(): Promise<ProjectIssueCount[]> {
     return this.issueModel.aggregate([
       {
         $group: {
@@ -59,9 +62,7 @@ export class ReportsService {
     ]);
   }
 
-  async getTopAssignedUsers(
-    limit = 10,
-  ): Promise<{ userId: string; name: string; email: string; assignedCount: number }[]> {
+  async getTopAssignedUsers(limit = 10): Promise<TopAssignedUser[]> {
     return this.issueModel.aggregate([
       { $match: { assignedTo: { $ne: null } } },
       {

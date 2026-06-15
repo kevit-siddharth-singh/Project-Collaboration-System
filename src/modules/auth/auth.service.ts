@@ -6,12 +6,14 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
-import { RegisterDto } from '../../dto/register.dto';
-import { LoginDto } from '../../dto/login.dto';
-import { UserRepository } from '../../../users/repositories/user.repository';
-import { JwtPayload } from '../../interfaces/jwt-payload.interface';
-import { CONFIG_KEYS } from '../../../../common/constants/config.constants';
-import { UserDocument } from '../../../../database/schemas/user.schema';
+import { BCRYPT_ROUNDS } from '../../common/constants/auth.constants';
+import { CONFIG_KEYS } from '../../common/constants/config.constants';
+import { sanitizeUser } from '../../common/utils/sanitize-user.util';
+import { UserDocument } from '../users/Schemas/user.schema';
+import { UserRepository } from '../users/repositories/user.repository';
+import { LoginDto } from './dto/login.dto';
+import { RegisterDto } from './dto/register.dto';
+import { JwtPayload } from './interfaces/jwt-payload.interface';
 
 export interface AuthTokens {
   accessToken: string;
@@ -41,13 +43,13 @@ export class AuthService {
     const tokens = await this.generateTokens(user);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
 
-    return { user: this.sanitizeUser(user), tokens };
+    return { user: sanitizeUser(user), tokens };
   }
 
   async login(
     dto: LoginDto,
   ): Promise<{ user: Partial<UserDocument>; tokens: AuthTokens }> {
-    const user = await this.userRepository.findOne({ email: dto.email });
+    const user = await this.userRepository.findByEmailWithPassword(dto.email);
     if (!user) throw new UnauthorizedException('Invalid credentials');
 
     const passwordMatch = await this.comparePassword(
@@ -59,14 +61,14 @@ export class AuthService {
     const tokens = await this.generateTokens(user);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
 
-    return { user: this.sanitizeUser(user), tokens };
+    return { user: sanitizeUser(user), tokens };
   }
 
   async refreshTokens(
     userId: string,
     refreshToken: string,
   ): Promise<AuthTokens> {
-    const user = await this.userRepository.findById(userId);
+    const user = await this.userRepository.findByIdWithRefreshToken(userId);
     if (!user?.hashedRefreshToken)
       throw new UnauthorizedException('Access denied');
 
@@ -82,7 +84,7 @@ export class AuthService {
   }
 
   async logout(userId: string): Promise<void> {
-    await this.userRepository.update(
+    await this.userRepository.findOneAndUpdate(
       { _id: userId },
       { $unset: { hashedRefreshToken: 1 } },
     );
@@ -117,15 +119,15 @@ export class AuthService {
     userId: string,
     refreshToken: string,
   ): Promise<void> {
-    const hashed = await bcrypt.hash(refreshToken, 10);
-    await this.userRepository.update(
+    const hashed = await bcrypt.hash(refreshToken, BCRYPT_ROUNDS);
+    await this.userRepository.findOneAndUpdate(
       { _id: userId },
       { hashedRefreshToken: hashed },
     );
   }
 
   private async hashPassword(password: string): Promise<string> {
-    return bcrypt.hash(password, 10);
+    return bcrypt.hash(password, BCRYPT_ROUNDS);
   }
 
   private async comparePassword(
@@ -133,12 +135,5 @@ export class AuthService {
     hashed: string,
   ): Promise<boolean> {
     return bcrypt.compare(plain, hashed);
-  }
-
-  private sanitizeUser(user: UserDocument): Partial<UserDocument> {
-    const { password, hashedRefreshToken, ...rest } = user.toObject();
-    void password;
-    void hashedRefreshToken;
-    return rest;
   }
 }

@@ -2,14 +2,17 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsEnum,
+  IsIn,
   IsInt,
   IsMongoId,
   IsOptional,
-  IsString,
   Min,
 } from 'class-validator';
 import { IssueStatus } from '../../../common/enums/issue-status.enum';
 import { IssuePriority } from '../../../common/enums/issue-priority.enum';
+
+const SORT_FIELDS = ['title', 'status', 'priority', 'createdAt'] as const;
+export type IssueSortField = (typeof SORT_FIELDS)[number];
 
 export class QueryIssueDto {
   @ApiPropertyOptional({ enum: IssueStatus })
@@ -28,12 +31,13 @@ export class QueryIssueDto {
   assignedTo?: string;
 
   @ApiPropertyOptional({
-    description: 'Sort field: title | status | priority | createdAt',
+    description: 'Sort field',
+    enum: SORT_FIELDS,
     default: 'createdAt',
   })
-  @IsString()
+  @IsIn(SORT_FIELDS)
   @IsOptional()
-  sortBy?: string;
+  sortBy?: IssueSortField;
 
   @ApiPropertyOptional({
     description: 'Sort direction: asc | desc',

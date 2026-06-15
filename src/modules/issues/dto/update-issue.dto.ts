@@ -1,10 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import {
-  IsEnum,
-  IsMongoId,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { IsEnum, IsMongoId, IsOptional, IsString } from 'class-validator';
 import { IssueStatus } from '../../../common/enums/issue-status.enum';
 import { IssuePriority } from '../../../common/enums/issue-priority.enum';
 

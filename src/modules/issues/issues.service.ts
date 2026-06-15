@@ -1,23 +1,14 @@
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Types } from 'mongoose';
-import { IssueRepository } from '../../repositories/issue.repository';
-import { ProjectsService } from '../../../projects/services/projects/projects.service';
-import { CreateIssueDto } from '../../dto/create-issue.dto';
-import { UpdateIssueDto } from '../../dto/update-issue.dto';
-import { QueryIssueDto } from '../../dto/query-issue.dto';
-import { JwtPayload } from '../../../auth/interfaces/jwt-payload.interface';
-import { IssueDocument } from '../../../../database/schemas/issue.schema';
+import { IssueRepository } from './repositories/issue.repository';
 
-export interface PaginatedIssues {
-  data: IssueDocument[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}
+import { CreateIssueDto } from './dto/create-issue.dto';
+import { UpdateIssueDto } from './dto/update-issue.dto';
+import { QueryIssueDto } from './dto/query-issue.dto';
+import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
+import { IssueDocument } from './Schemas/issue.schema';
+import { PaginatedIssues } from './issues.interface';
+import { ProjectsService } from '../projects/projects.service';
 
 @Injectable()
 export class IssuesService {
@@ -38,7 +29,7 @@ export class IssuesService {
       description: dto.description,
       status: dto.status,
       priority: dto.priority,
-      projectId: project._id as Types.ObjectId,
+      projectId: project._id,
       ...(dto.assignedTo && { assignedTo: new Types.ObjectId(dto.assignedTo) }),
     });
   }
@@ -68,27 +59,23 @@ export class IssuesService {
     if (priority) filter.priority = priority;
     if (assignedTo) filter.assignedTo = new Types.ObjectId(assignedTo);
 
-    const allowedSortFields = ['title', 'status', 'priority', 'createdAt'];
-    const safeSort = allowedSortFields.includes(sortBy) ? sortBy : 'createdAt';
     const sort: Record<string, 1 | -1> = {
-      [safeSort]: sortOrder === 'asc' ? 1 : -1,
+      [sortBy]: sortOrder === 'asc' ? 1 : -1,
     };
-
     const skip = (page - 1) * limit;
 
     const [data, total] = await Promise.all([
-      this.issueRepository.model
-        .find(filter)
-        .sort(sort)
-        .skip(skip)
-        .limit(limit)
-        .populate('assignedTo', 'name email')
-        .exec(),
-      this.issueRepository.model.countDocuments(filter).exec(),
+      this.issueRepository.findWithOptions(filter, {
+        sort,
+        skip,
+        limit,
+        populate: { path: 'assignedTo', select: 'name email' },
+      }),
+      this.issueRepository.count(filter),
     ]);
 
     return {
-      data,
+      data: data,
       total,
       page,
       limit,
@@ -103,11 +90,10 @@ export class IssuesService {
   ): Promise<IssueDocument> {
     await this.projectsService.findById(projectId, currentUser);
 
-    const issue = await this.issueRepository
-      .model
-      .findOne({ _id: issueId, projectId: new Types.ObjectId(projectId) })
-      .populate('assignedTo', 'name email')
-      .exec();
+    const issue = await this.issueRepository.findOneWithPopulate(
+      { _id: issueId, projectId: new Types.ObjectId(projectId) },
+      { path: 'assignedTo', select: 'name email' },
+    );
 
     if (!issue) throw new NotFoundException('Issue not found');
     return issue;
@@ -121,7 +107,7 @@ export class IssuesService {
   ): Promise<IssueDocument> {
     await this.projectsService.findById(projectId, currentUser);
 
-    const updated = await this.issueRepository.update(
+    const updated = await this.issueRepository.findOneAndUpdate(
       { _id: issueId, projectId: new Types.ObjectId(projectId) },
       {
         ...dto,

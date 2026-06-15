@@ -11,13 +11,14 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { ProjectsService } from '../../services/projects/projects.service';
-import { CreateProjectDto } from '../../dto/create-project.dto';
-import { UpdateProjectDto } from '../../dto/update-project.dto';
-import { JwtAuthGuard } from '../../../../common/guards/jwt-auth.guard';
-import { CurrentUser } from '../../../../common/decorators/current-user.decorator';
-import type { JwtPayload } from '../../../auth/interfaces/jwt-payload.interface';
-import { ParseMongoIdPipe } from '../../../../common/pipes/parse-mongo-id.pipe';
+
+import type { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { ParseMongoIdPipe } from '../../common/pipes/parse-mongo-id.pipe';
+import { CreateProjectDto } from './dto/create-project.dto';
+import { UpdateProjectDto } from './dto/update-project.dto';
+import { ProjectsService } from './projects.service';
 
 @ApiTags('Projects')
 @ApiBearerAuth()

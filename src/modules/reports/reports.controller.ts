@@ -1,10 +1,11 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { ReportsService } from '../../services/reports/reports.service';
-import { JwtAuthGuard } from '../../../../common/guards/jwt-auth.guard';
-import { RolesGuard } from '../../../../common/guards/role.guard';
-import { Roles } from '../../../../common/decorators/roles.decorator';
-import { UserRole } from '../../../../common/enums/user-role.enums';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { UserRole } from '../../common/enums/user-role.enums';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../../common/guards/role.guard';
+import { TopUsersQueryDto } from './dto/top-users-query.dto';
+import { ReportsService } from './reports.service';
 
 @ApiTags('Reports')
 @ApiBearerAuth()
@@ -28,8 +29,7 @@ export class ReportsController {
 
   @Get('top-assigned-users')
   @ApiOperation({ summary: 'Top users with most assigned issues (Admin only)' })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Max users to return (default 10)' })
-  topAssignedUsers(@Query('limit') limit?: number) {
-    return this.reportsService.getTopAssignedUsers(limit ? Number(limit) : 10);
+  topAssignedUsers(@Query() query: TopUsersQueryDto) {
+    return this.reportsService.getTopAssignedUsers(query.limit);
   }
 }

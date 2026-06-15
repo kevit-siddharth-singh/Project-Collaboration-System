@@ -12,14 +12,14 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { IssuesService } from '../../services/issues/issues.service';
-import { CreateIssueDto } from '../../dto/create-issue.dto';
-import { UpdateIssueDto } from '../../dto/update-issue.dto';
-import { QueryIssueDto } from '../../dto/query-issue.dto';
-import { JwtAuthGuard } from '../../../../common/guards/jwt-auth.guard';
-import { CurrentUser } from '../../../../common/decorators/current-user.decorator';
-import type { JwtPayload } from '../../../auth/interfaces/jwt-payload.interface';
-import { ParseMongoIdPipe } from '../../../../common/pipes/parse-mongo-id.pipe';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import type { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
+import { IssuesService } from './issues.service';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { ParseMongoIdPipe } from '../../common/pipes/parse-mongo-id.pipe';
+import { CreateIssueDto } from './dto/create-issue.dto';
+import { QueryIssueDto } from './dto/query-issue.dto';
+import { UpdateIssueDto } from './dto/update-issue.dto';
 
 @ApiTags('Issues')
 @ApiBearerAuth()

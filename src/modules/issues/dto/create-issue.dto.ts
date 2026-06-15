@@ -15,7 +15,9 @@ export class CreateIssueDto {
   @IsNotEmpty()
   title!: string;
 
-  @ApiPropertyOptional({ example: 'Users cannot login with special characters in password' })
+  @ApiPropertyOptional({
+    example: 'Users cannot login with special characters in password',
+  })
   @IsString()
   @IsOptional()
   description?: string;

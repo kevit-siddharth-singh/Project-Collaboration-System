@@ -4,12 +4,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Types } from 'mongoose';
-import { ProjectRepository } from '../../repositories/project.repository';
-import { CreateProjectDto } from '../../dto/create-project.dto';
-import { UpdateProjectDto } from '../../dto/update-project.dto';
-import { JwtPayload } from '../../../auth/interfaces/jwt-payload.interface';
-import { UserRole } from '../../../../common/enums/user-role.enums';
-import { ProjectDocument } from '../../../../database/schemas/project.schema';
+import { ProjectRepository } from './repositories/project.repository';
+import { UserRole } from '../../common/enums/user-role.enums';
+import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
+import { CreateProjectDto } from './dto/create-project.dto';
+import { UpdateProjectDto } from './dto/update-project.dto';
+import { ProjectDocument } from './Schemas/project.schema';
 
 @Injectable()
 export class ProjectsService {
@@ -52,27 +52,32 @@ export class ProjectsService {
     dto: UpdateProjectDto,
     currentUser: JwtPayload,
   ): Promise<ProjectDocument> {
-    const project = await this.projectRepository.findById(id);
-    if (!project) throw new NotFoundException('Project not found');
-    this.assertOwnerOrAdmin(project, currentUser);
+    const filter =
+      currentUser.role === UserRole.ADMIN
+        ? { _id: id }
+        : { _id: id, owner: new Types.ObjectId(currentUser.sub) };
 
-    const updated = await this.projectRepository.update(
-      { _id: id },
-      {
-        ...dto,
-        ...(dto.members && {
-          members: dto.members.map((m) => new Types.ObjectId(m)),
-        }),
-      },
-    );
-    return updated!;
+    const updated = await this.projectRepository.findOneAndUpdate(filter, {
+      ...dto,
+      ...(dto.members && {
+        members: dto.members.map((m) => new Types.ObjectId(m)),
+      }),
+    });
+
+    if (!updated)
+      throw new NotFoundException('Project not found or access denied');
+    return updated;
   }
 
   async delete(id: string, currentUser: JwtPayload): Promise<void> {
-    const project = await this.projectRepository.findById(id);
-    if (!project) throw new NotFoundException('Project not found');
-    this.assertOwnerOrAdmin(project, currentUser);
-    await this.projectRepository.delete({ _id: id });
+    const filter =
+      currentUser.role === UserRole.ADMIN
+        ? { _id: id }
+        : { _id: id, owner: new Types.ObjectId(currentUser.sub) };
+
+    const deleted = await this.projectRepository.delete(filter);
+    if (!deleted)
+      throw new NotFoundException('Project not found or access denied');
   }
 
   assertAccess(project: ProjectDocument, user: JwtPayload): void {
@@ -82,13 +87,5 @@ export class ProjectsService {
     const isMember = project.members.some((m) => m.toString() === userId);
     if (!isOwner && !isMember)
       throw new ForbiddenException('You do not have access to this project');
-  }
-
-  private assertOwnerOrAdmin(project: ProjectDocument, user: JwtPayload): void {
-    if (user.role === UserRole.ADMIN) return;
-    if (project.owner.toString() !== user.sub)
-      throw new ForbiddenException(
-        'Only the project owner can perform this action',
-      );
   }
 }

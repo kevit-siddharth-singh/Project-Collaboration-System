@@ -1,22 +1,22 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
-import { IssueStatus } from '../../common/enums/issue-status.enum';
-import { IssuePriority } from '../../common/enums/issue-priority.enum';
+import { IssueStatus } from '../../../common/enums/issue-status.enum';
+import { IssuePriority } from '../../../common/enums/issue-priority.enum';
 
 export type IssueDocument = HydratedDocument<Issue>;
 
 @Schema({ timestamps: true })
 export class Issue {
-  @Prop({ required: true, trim: true })
+  @Prop({ type: String, required: true, trim: true })
   title!: string;
 
-  @Prop({ trim: true })
+  @Prop({ type: String, trim: true })
   description?: string;
 
-  @Prop({ enum: IssueStatus, default: IssueStatus.TODO })
+  @Prop({ type: String, enum: IssueStatus, default: IssueStatus.TODO })
   status!: IssueStatus;
 
-  @Prop({ enum: IssuePriority, default: IssuePriority.MEDIUM })
+  @Prop({ type: String, enum: IssuePriority, default: IssuePriority.MEDIUM })
   priority!: IssuePriority;
 
   @Prop({ type: Types.ObjectId, ref: 'User' })
