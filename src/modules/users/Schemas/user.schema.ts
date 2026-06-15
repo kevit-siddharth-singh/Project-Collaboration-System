@@ -1,14 +1,19 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { Exclude, Expose, Transform } from 'class-transformer';
+import { HydratedDocument, Types } from 'mongoose';
 
 import { UserRole } from '../../../common/enums/user-role.enums';
 
 export type UserDocument = HydratedDocument<User>;
 
-@Schema({
-  timestamps: true,
-})
+@Exclude()
+@Schema({ timestamps: true })
 export class User {
+  @Expose()
+  @Transform(({ value }: { value: Types.ObjectId }) => value?.toString())
+  _id?: Types.ObjectId;
+
+  @Expose()
   @Prop({
     type: String,
     required: true,
@@ -16,6 +21,7 @@ export class User {
   })
   name!: string;
 
+  @Expose()
   @Prop({
     type: String,
     required: true,
@@ -31,6 +37,7 @@ export class User {
   })
   password!: string;
 
+  @Expose()
   @Prop({
     type: String,
     enum: UserRole,
@@ -43,6 +50,12 @@ export class User {
     select: false,
   })
   hashedRefreshToken?: string;
+
+  @Expose()
+  createdAt?: Date;
+
+  @Expose()
+  updatedAt?: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

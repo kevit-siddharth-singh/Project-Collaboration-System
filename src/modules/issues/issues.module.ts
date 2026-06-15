@@ -14,5 +14,6 @@ import { IssuesController } from './issues.controller';
   ],
   controllers: [IssuesController],
   providers: [IssuesService, IssueRepository],
+  exports: [IssueRepository],
 })
 export class IssuesModule {}

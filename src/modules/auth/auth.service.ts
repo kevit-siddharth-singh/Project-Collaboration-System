@@ -9,7 +9,7 @@ import * as bcrypt from 'bcrypt';
 import { BCRYPT_ROUNDS } from '../../common/constants/auth.constants';
 import { CONFIG_KEYS } from '../../common/constants/config.constants';
 import { sanitizeUser } from '../../common/utils/sanitize-user.util';
-import { UserDocument } from '../users/Schemas/user.schema';
+import type { User, UserDocument } from '../users/Schemas/user.schema';
 import { UserRepository } from '../users/repositories/user.repository';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -30,7 +30,7 @@ export class AuthService {
 
   async register(
     dto: RegisterDto,
-  ): Promise<{ user: Partial<UserDocument>; tokens: AuthTokens }> {
+  ): Promise<{ user: User; tokens: AuthTokens }> {
     const existing = await this.userRepository.findOne({ email: dto.email });
     if (existing) throw new ConflictException('Email is already registered');
 
@@ -46,9 +46,7 @@ export class AuthService {
     return { user: sanitizeUser(user), tokens };
   }
 
-  async login(
-    dto: LoginDto,
-  ): Promise<{ user: Partial<UserDocument>; tokens: AuthTokens }> {
+  async login(dto: LoginDto): Promise<{ user: User; tokens: AuthTokens }> {
     const user = await this.userRepository.findByEmailWithPassword(dto.email);
     if (!user) throw new UnauthorizedException('Invalid credentials');
 

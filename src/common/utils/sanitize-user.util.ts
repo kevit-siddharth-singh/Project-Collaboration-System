@@ -1,8 +1,6 @@
-import { UserDocument } from '../../modules/users/Schemas/user.schema';
+import { plainToInstance } from 'class-transformer';
+import { User, UserDocument } from '../../modules/users/Schemas/user.schema';
 
-export function sanitizeUser(user: UserDocument): Partial<UserDocument> {
-  const { password, hashedRefreshToken, ...rest } = user.toObject();
-  void password;
-  void hashedRefreshToken;
-  return rest;
+export function sanitizeUser(user: UserDocument): User {
+  return plainToInstance(User, user.toObject());
 }

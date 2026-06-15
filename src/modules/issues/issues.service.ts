@@ -1,14 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Types } from 'mongoose';
 import { IssueRepository } from './repositories/issue.repository';
-
+import { ProjectsService } from '../projects/projects.service';
 import { CreateIssueDto } from './dto/create-issue.dto';
 import { UpdateIssueDto } from './dto/update-issue.dto';
 import { QueryIssueDto } from './dto/query-issue.dto';
 import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 import { IssueDocument } from './Schemas/issue.schema';
 import { PaginatedIssues } from './issues.interface';
-import { ProjectsService } from '../projects/projects.service';
+import { ProjectDocument } from '../projects/Schemas/project.schema';
 
 @Injectable()
 export class IssuesService {
@@ -22,7 +22,7 @@ export class IssuesService {
     dto: CreateIssueDto,
     currentUser: JwtPayload,
   ): Promise<IssueDocument> {
-    const project = await this.projectsService.findById(projectId, currentUser);
+    const project = await this.validateProjectAccess(projectId, currentUser);
 
     return this.issueRepository.create({
       title: dto.title,
@@ -39,7 +39,7 @@ export class IssuesService {
     query: QueryIssueDto,
     currentUser: JwtPayload,
   ): Promise<PaginatedIssues> {
-    await this.projectsService.findById(projectId, currentUser);
+    await this.validateProjectAccess(projectId, currentUser);
 
     const {
       status,
@@ -88,7 +88,7 @@ export class IssuesService {
     issueId: string,
     currentUser: JwtPayload,
   ): Promise<IssueDocument> {
-    await this.projectsService.findById(projectId, currentUser);
+    await this.validateProjectAccess(projectId, currentUser);
 
     const issue = await this.issueRepository.findOneWithPopulate(
       { _id: issueId, projectId: new Types.ObjectId(projectId) },
@@ -105,7 +105,7 @@ export class IssuesService {
     dto: UpdateIssueDto,
     currentUser: JwtPayload,
   ): Promise<IssueDocument> {
-    await this.projectsService.findById(projectId, currentUser);
+    await this.validateProjectAccess(projectId, currentUser);
 
     const updated = await this.issueRepository.findOneAndUpdate(
       { _id: issueId, projectId: new Types.ObjectId(projectId) },
@@ -126,7 +126,7 @@ export class IssuesService {
     issueId: string,
     currentUser: JwtPayload,
   ): Promise<void> {
-    await this.projectsService.findById(projectId, currentUser);
+    await this.validateProjectAccess(projectId, currentUser);
 
     const deleted = await this.issueRepository.delete({
       _id: issueId,
@@ -134,5 +134,12 @@ export class IssuesService {
     });
 
     if (!deleted) throw new NotFoundException('Issue not found');
+  }
+
+  private async validateProjectAccess(
+    projectId: string,
+    currentUser: JwtPayload,
+  ): Promise<ProjectDocument> {
+    return this.projectsService.findById(projectId, currentUser);
   }
 }
