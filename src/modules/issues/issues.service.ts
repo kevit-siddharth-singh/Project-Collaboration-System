@@ -30,7 +30,9 @@ export class IssuesService {
       status: dto.status,
       priority: dto.priority,
       projectId: project._id,
-      ...(dto.assignedTo && { assignedTo: new Types.ObjectId(dto.assignedTo) }),
+      assignedTo: dto.assignedTo
+        ? new Types.ObjectId(dto.assignedTo)
+        : undefined,
     });
   }
 
@@ -111,9 +113,9 @@ export class IssuesService {
       { _id: issueId, projectId: new Types.ObjectId(projectId) },
       {
         ...dto,
-        ...(dto.assignedTo && {
-          assignedTo: new Types.ObjectId(dto.assignedTo),
-        }),
+        assignedTo: dto.assignedTo
+          ? new Types.ObjectId(dto.assignedTo)
+          : undefined,
       },
     );
 
